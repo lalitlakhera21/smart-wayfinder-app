@@ -36,7 +36,9 @@
 
     --radius: 0.75rem;
 
+    --nav-start: 340 75% 55%;
     --nav-building: 217 91% 60%;
+    --nav-block: 190 80% 45%;
     --nav-floor: 262 83% 58%;
     --nav-direction: 25 95% 53%;
     --nav-room: 142 72% 42%;
@@ -101,23 +103,33 @@
 }
 
 @layer utilities {
+  .nav-step-start {
+    background: hsl(var(--nav-start) / 0.1);
+    color: hsl(var(--nav-start));
+    border-color: hsl(var(--nav-start) / 0.25);
+  }
   .nav-step-building {
     @apply bg-primary/10 text-primary border-primary/20;
+  }
+  .nav-step-block {
+    background: hsl(var(--nav-block) / 0.1);
+    color: hsl(var(--nav-block));
+    border-color: hsl(var(--nav-block) / 0.25);
   }
   .nav-step-floor {
     background: hsl(var(--nav-floor) / 0.1);
     color: hsl(var(--nav-floor));
-    border-color: hsl(var(--nav-floor) / 0.2);
+    border-color: hsl(var(--nav-floor) / 0.25);
   }
   .nav-step-direction {
     background: hsl(var(--nav-direction) / 0.1);
     color: hsl(var(--nav-direction));
-    border-color: hsl(var(--nav-direction) / 0.2);
+    border-color: hsl(var(--nav-direction) / 0.25);
   }
   .nav-step-room {
     background: hsl(var(--nav-room) / 0.1);
     color: hsl(var(--nav-room));
-    border-color: hsl(var(--nav-room) / 0.2);
+    border-color: hsl(var(--nav-room) / 0.25);
   }
   .glass-card {
     @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
