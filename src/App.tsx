@@ -22,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<Admin section="dashboard" />} />
             <Route path="/admin/rooms" element={<Admin section="rooms" />} />
             <Route path="/admin/users" element={<Admin section="users" />} />
