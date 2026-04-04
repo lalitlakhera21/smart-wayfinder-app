@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       rooms: {
         Row: {
+          block: string
           building: string
           created_at: string
           direction: string
@@ -26,6 +27,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          block?: string
           building: string
           created_at?: string
           direction: string
@@ -36,6 +38,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          block?: string
           building?: string
           created_at?: string
           direction?: string
