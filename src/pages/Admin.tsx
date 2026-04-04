@@ -10,7 +10,6 @@ import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Loader2, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface AdminLayoutProps {
   section?: string;
@@ -18,7 +17,6 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ section = "dashboard" }: AdminLayoutProps) {
   const { user, isAdmin, loading } = useAuth();
-  const navigate = useNavigate();
   const { dark, toggle } = useTheme();
 
   if (loading) {
