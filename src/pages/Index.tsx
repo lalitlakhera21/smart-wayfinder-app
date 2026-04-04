@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import RoomCard from "@/components/RoomCard";
@@ -23,11 +24,14 @@ export default function Index() {
     ? results.filter((r) => r.floor === floorFilter)
     : results;
 
-  const handleSearch = (q: string) => {
+  const handleSearch = useCallback((q: string) => {
     setQuery(q);
     setFloorFilter(null);
-    if (q.trim()) add(q);
-  };
+    if (q.trim()) {
+      add(q);
+      supabase.from("search_logs").insert({ query: q.trim() }).then(() => {});
+    }
+  }, [add]);
 
   const uniqueFloors = query.trim()
     ? [...new Set(results.map((r) => r.floor))]
