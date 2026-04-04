@@ -80,6 +80,7 @@ export default function Admin() {
   const handleEdit = (room: Room) => {
     setForm({
       building: room.building,
+      block: room.block,
       floor: room.floor,
       room: room.room,
       direction: room.direction,
