@@ -1,4 +1,4 @@
-import { Building2, Layers, ArrowRight, DoorOpen, ChevronRight } from "lucide-react";
+import { Building2, Layers, ArrowRight, DoorOpen } from "lucide-react";
 import type { Room } from "@/hooks/useRooms";
 
 const steps = [
@@ -10,20 +10,24 @@ const steps = [
 
 export default function NavigationSteps({ room }: { room: Room }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {steps.map((step, i) => (
-        <div key={step.key} className="flex items-center gap-3 animate-in slide-in-from-left" style={{ animationDelay: `${i * 100}ms` }}>
-          {i > 0 && (
-            <div className="absolute -mt-10 ml-5 w-0.5 h-6 bg-border" />
-          )}
-          <div className={`relative flex items-center gap-3 px-4 py-3 rounded-xl border w-full ${step.className}`}>
-            <step.icon className="h-5 w-5 flex-shrink-0" />
-            <span className="text-sm font-medium opacity-70">{step.label}</span>
-            <span className="font-semibold">{room[step.key]}</span>
+        <div key={step.key} className="flex items-center gap-2">
+          {/* Step number */}
+          <div className="flex flex-col items-center">
+            <div className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold ${step.className}`}>
+              {i + 1}
+            </div>
+            {i < steps.length - 1 && (
+              <div className="w-0.5 h-2 bg-border mt-0.5" />
+            )}
           </div>
-          {i < steps.length - 1 && (
-            <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 hidden sm:block" />
-          )}
+          {/* Step content */}
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border flex-1 ${step.className} transition-all duration-200`}>
+            <step.icon className="h-4 w-4 flex-shrink-0 opacity-70" />
+            <span className="text-xs font-medium opacity-60">{step.label}</span>
+            <span className="font-semibold text-sm">{room[step.key]}</span>
+          </div>
         </div>
       ))}
     </div>
