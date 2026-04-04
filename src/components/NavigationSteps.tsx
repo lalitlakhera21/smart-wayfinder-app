@@ -1,4 +1,4 @@
-import { Navigation, Building2, DoorOpen, Layers, ArrowRight, Footprints, ArrowUp } from "lucide-react";
+import { Navigation, Building2, DoorOpen, Layers, ArrowRight, Footprints, ArrowUp, Landmark } from "lucide-react";
 import type { Room } from "@/hooks/useRooms";
 
 export default function NavigationSteps({ room }: { room: Room }) {
@@ -8,43 +8,50 @@ export default function NavigationSteps({ room }: { room: Room }) {
     room.direction === "Straight" ? "Go Straight" :
     `Go ${room.direction}`;
 
-  const steps = [
+  const baseSteps = [
     {
       icon: Navigation,
       label: "Start from",
-      value: "Main Campus Gate",
-      detail: "Enter the campus from the main entrance",
+      value: "VGU Main Gate",
+      detail: "Enter Vivekananda Global University from the main entrance",
       className: "nav-step-start",
     },
     {
       icon: Building2,
       label: "Go to",
-      value: "Academic Building",
-      detail: "Walk towards the Academic Building complex",
+      value: room.building,
+      detail: `Walk towards ${room.building} — one of the 3 main buildings`,
       className: "nav-step-building",
     },
-    {
-      icon: DoorOpen,
+  ];
+
+  // Only show block step if block is specified
+  if (room.block) {
+    baseSteps.push({
+      icon: Landmark,
       label: "Enter",
-      value: room.building,
-      detail: `Find and enter ${room.building}`,
+      value: room.block,
+      detail: `Find ${room.block} section inside ${room.building}`,
       className: "nav-step-block",
-    },
+    });
+  }
+
+  baseSteps.push(
     {
       icon: ArrowUp,
       label: "Take Stairs to",
       value: room.floor,
       detail: room.floor === "Ground Floor"
-        ? "Stay on the ground level"
+        ? "Stay on the ground level — no stairs needed"
         : room.floor === "Basement Floor"
-        ? "Go down the stairs to basement"
+        ? "Go down the stairs to the basement level"
         : `Climb the stairs up to ${room.floor}`,
       className: "nav-step-floor",
     },
     {
       icon: ArrowRight,
       label: directionLabel,
-      value: `from Stairs`,
+      value: "from Stairs",
       detail: `After reaching ${room.floor}, ${directionLabel.toLowerCase()} from the staircase`,
       className: "nav-step-direction",
     },
@@ -55,7 +62,7 @@ export default function NavigationSteps({ room }: { room: Room }) {
       detail: `${room.type} — ${room.room} is on your ${room.direction.toLowerCase()} side`,
       className: "nav-step-room",
     },
-  ];
+  );
 
   return (
     <div className="relative">
@@ -63,7 +70,7 @@ export default function NavigationSteps({ room }: { room: Room }) {
       <div className="absolute left-[18px] top-5 bottom-5 w-0.5 bg-border" />
 
       <div className="flex flex-col gap-1">
-        {steps.map((step, i) => (
+        {baseSteps.map((step, i) => (
           <div
             key={i}
             className="flex items-start gap-3 relative animate-in fade-in slide-in-from-left"

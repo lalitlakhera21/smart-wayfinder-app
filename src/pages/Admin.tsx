@@ -13,20 +13,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Pencil, Trash2, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const BUILDINGS = ["Admin Block", "Academic Block A", "Academic Block B", "Science Block", "Engineering Block", "Library Block"];
-const FLOORS = ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"];
+const BUILDINGS = ["Tech Block", "Admin Block", "Academic Block"];
+const BLOCKS = ["", "Management Block", "Science Block", "Engineering Block", "Library Block"];
+const FLOORS = ["Basement Floor", "Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor"];
 const DIRECTIONS = ["Left", "Right", "Straight", "End of Corridor"];
 const TYPES = ["Classroom", "Lab", "Office", "Library", "Canteen", "Auditorium", "Seminar Hall"];
 
 interface RoomFormData {
   building: string;
+  block: string;
   floor: string;
   room: string;
   direction: string;
   type: string;
 }
 
-const emptyForm: RoomFormData = { building: "", floor: "", room: "", direction: "", type: "" };
+const emptyForm: RoomFormData = { building: "", block: "", floor: "", room: "", direction: "", type: "" };
 
 export default function Admin() {
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
@@ -78,6 +80,7 @@ export default function Admin() {
   const handleEdit = (room: Room) => {
     setForm({
       building: room.building,
+      block: room.block,
       floor: room.floor,
       room: room.room,
       direction: room.direction,
@@ -122,6 +125,12 @@ export default function Admin() {
                     <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select Building" /></SelectTrigger>
                     <SelectContent>
                       {BUILDINGS.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <Select value={form.block} onValueChange={(v) => setForm({ ...form, block: v })}>
+                    <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select Block/Section (optional)" /></SelectTrigger>
+                    <SelectContent>
+                      {BLOCKS.map((b) => <SelectItem key={b || "none"} value={b}>{b || "— None —"}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <Select value={form.floor} onValueChange={(v) => setForm({ ...form, floor: v })}>

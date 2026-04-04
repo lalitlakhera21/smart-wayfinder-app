@@ -1,4 +1,4 @@
-import { Building2, DoorOpen, FlaskConical, Briefcase, BookOpen, Coffee, Mic2, GraduationCap } from "lucide-react";
+import { Building2, DoorOpen, FlaskConical, Briefcase, BookOpen, Coffee, Mic2, GraduationCap, Landmark } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Room } from "@/hooks/useRooms";
 import NavigationSteps from "./NavigationSteps";
@@ -40,7 +40,11 @@ export default function RoomCard({ room, onClick }: { room: Room; onClick?: () =
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground leading-tight">{room.room}</h3>
-              <p className="text-xs text-muted-foreground">{room.building} • {room.floor}</p>
+              <p className="text-xs text-muted-foreground">
+                {room.building}
+                {room.block ? ` • ${room.block}` : ""}
+                {" • "}{room.floor}
+              </p>
             </div>
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${colorClass} whitespace-nowrap`}>

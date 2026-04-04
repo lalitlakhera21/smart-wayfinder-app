@@ -23,6 +23,7 @@ export function useSearchRooms(query: string) {
     (r) =>
       r.room.toLowerCase().includes(q) ||
       r.building.toLowerCase().includes(q) ||
+      r.block.toLowerCase().includes(q) ||
       r.type.toLowerCase().includes(q)
   );
 }
