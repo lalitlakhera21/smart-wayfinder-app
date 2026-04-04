@@ -11,8 +11,10 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, isAdmin, user } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, isAdmin, user } = useAuth();
   const navigate = useNavigate();
   useTheme();
 
@@ -24,14 +26,26 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
-    const { error: err } = await signIn(email, password);
-    setLoading(false);
-    if (err) {
-      setError(err);
+
+    if (isSignUp) {
+      const { error: err } = await signUp(email, password);
+      setLoading(false);
+      if (err) {
+        setError(err);
+      } else {
+        setSuccess("Account created! You can now sign in.");
+        setIsSignUp(false);
+      }
     } else {
-      // Wait a tick for auth state to update
-      setTimeout(() => navigate("/admin"), 300);
+      const { error: err } = await signIn(email, password);
+      setLoading(false);
+      if (err) {
+        setError(err);
+      } else {
+        setTimeout(() => navigate("/admin"), 300);
+      }
     }
   };
 
@@ -42,15 +56,18 @@ export default function Login() {
           <div className="mx-auto h-12 w-12 rounded-xl bg-primary flex items-center justify-center mb-2">
             <MapPin className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
-          <p className="text-sm text-muted-foreground">Sign in to manage campus rooms</p>
+          <CardTitle className="text-2xl font-bold">{isSignUp ? "Create Account" : "Admin Login"}</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {isSignUp ? "Sign up to get started" : "Sign in to manage campus rooms"}
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">
-                {error}
-              </div>
+              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>
+            )}
+            {success && (
+              <div className="p-3 rounded-xl bg-accent/10 text-accent text-sm">{success}</div>
             )}
             <Input
               type="email"
@@ -62,16 +79,26 @@ export default function Login() {
             />
             <Input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="rounded-xl py-5"
             />
             <Button type="submit" className="w-full rounded-xl py-5" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isSignUp ? "Sign Up" : "Sign In"}
             </Button>
           </form>
+          <div className="text-center mt-4">
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccess(""); }}
+              className="text-sm text-primary hover:underline"
+            >
+              {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
