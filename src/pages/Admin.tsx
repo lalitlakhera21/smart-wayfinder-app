@@ -27,18 +27,7 @@ export default function AdminLayout({ section = "dashboard" }: AdminLayoutProps)
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">You don't have admin access.</p>
-        <Link to="/" className="text-primary hover:underline text-sm">Go to Home</Link>
-      </div>
-    );
-  }
+  // Auth check removed — open access for now
 
   const renderSection = () => {
     switch (section) {
