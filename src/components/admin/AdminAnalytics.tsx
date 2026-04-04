@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRooms } from "@/hooks/useRooms";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { Badge } from "@/components/ui/badge";
 import { Loader2, TrendingUp, Search } from "lucide-react";
 
 const COLORS = [
