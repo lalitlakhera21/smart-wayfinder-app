@@ -12,8 +12,15 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+    },
     extend: {
       colors: {
+        "nav-building": "hsl(var(--nav-building))",
+        "nav-floor": "hsl(var(--nav-floor))",
+        "nav-direction": "hsl(var(--nav-direction))",
+        "nav-room": "hsl(var(--nav-room))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
