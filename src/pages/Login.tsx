@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ export default function Login() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
   const { signIn, signUp, isAdmin, user } = useAuth();
   const navigate = useNavigate();
   useTheme();
@@ -22,9 +24,6 @@ export default function Login() {
     navigate("/admin");
     return null;
   }
-
-  const [forgotMode, setForgotMode] = useState(false);
-  const [resetSent, setResetSent] = useState("");
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ export default function Login() {
     if (err) {
       setError(err.message);
     } else {
-      setResetSent("Password reset link sent to your email! Check your inbox.");
+      setSuccess("Password reset link tumhare email pe bhej diya gaya hai! Inbox check karo.");
     }
   };
 
@@ -74,49 +73,77 @@ export default function Login() {
           <div className="mx-auto h-12 w-12 rounded-xl bg-primary flex items-center justify-center mb-2">
             <MapPin className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">{isSignUp ? "Create Account" : "Admin Login"}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {forgotMode ? "Reset Password" : isSignUp ? "Create Account" : "Admin Login"}
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
-            {isSignUp ? "Sign up to get started" : "Sign in to manage campus rooms"}
+            {forgotMode ? "Enter your email to receive a reset link" : isSignUp ? "Sign up to get started" : "Sign in to manage campus rooms"}
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>
-            )}
-            {success && (
-              <div className="p-3 rounded-xl bg-accent/10 text-accent text-sm">{success}</div>
-            )}
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="rounded-xl py-5"
-            />
-            <Input
-              type="password"
-              placeholder="Password (min 6 characters)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="rounded-xl py-5"
-            />
-            <Button type="submit" className="w-full rounded-xl py-5" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
-          </form>
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccess(""); }}
-              className="text-sm text-primary hover:underline"
-            >
-              {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
-            </button>
-          </div>
+          {forgotMode ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              {error && <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>}
+              {success && <div className="p-3 rounded-xl bg-accent/10 text-accent text-sm">{success}</div>}
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="rounded-xl py-5"
+              />
+              <Button type="submit" className="w-full rounded-xl py-5" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Reset Link"}
+              </Button>
+              <div className="text-center">
+                <button type="button" onClick={() => { setForgotMode(false); setError(""); setSuccess(""); }} className="text-sm text-primary hover:underline">
+                  ← Back to Login
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>}
+                {success && <div className="p-3 rounded-xl bg-accent/10 text-accent text-sm">{success}</div>}
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="rounded-xl py-5"
+                />
+                <Input
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="rounded-xl py-5"
+                />
+                <Button type="submit" className="w-full rounded-xl py-5" disabled={loading}>
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isSignUp ? "Sign Up" : "Sign In"}
+                </Button>
+              </form>
+              <div className="text-center mt-4 space-y-2">
+                {!isSignUp && (
+                  <button type="button" onClick={() => { setForgotMode(true); setError(""); setSuccess(""); }} className="text-sm text-muted-foreground hover:underline block w-full">
+                    Forgot Password?
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccess(""); }}
+                  className="text-sm text-primary hover:underline"
+                >
+                  {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                </button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
