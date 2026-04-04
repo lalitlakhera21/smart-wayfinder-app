@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import RoomCard from "@/components/RoomCard";
