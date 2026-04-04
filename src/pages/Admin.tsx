@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,7 +10,6 @@ import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Loader2, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface AdminLayoutProps {
   section?: string;
@@ -18,7 +17,6 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ section = "dashboard" }: AdminLayoutProps) {
   const { user, isAdmin, loading } = useAuth();
-  const navigate = useNavigate();
   const { dark, toggle } = useTheme();
 
   if (loading) {
@@ -29,9 +27,17 @@ export default function AdminLayout({ section = "dashboard" }: AdminLayoutProps)
     );
   }
 
-  if (!user || !isAdmin) {
-    navigate("/login");
-    return null;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground">You don't have admin access.</p>
+        <Link to="/" className="text-primary hover:underline text-sm">Go to Home</Link>
+      </div>
+    );
   }
 
   const renderSection = () => {
