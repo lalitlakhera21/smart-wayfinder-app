@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          message: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rooms: {
         Row: {
           block: string
@@ -49,6 +79,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      search_logs: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          room_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          room_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          room_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_logs_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
