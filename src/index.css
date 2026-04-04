@@ -36,7 +36,9 @@
 
     --radius: 0.75rem;
 
+    --nav-start: 340 75% 55%;
     --nav-building: 217 91% 60%;
+    --nav-block: 190 80% 45%;
     --nav-floor: 262 83% 58%;
     --nav-direction: 25 95% 53%;
     --nav-room: 142 72% 42%;
