@@ -127,6 +127,12 @@ export default function Admin() {
                       {BUILDINGS.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <Select value={form.block} onValueChange={(v) => setForm({ ...form, block: v })}>
+                    <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select Block/Section (optional)" /></SelectTrigger>
+                    <SelectContent>
+                      {BLOCKS.map((b) => <SelectItem key={b || "none"} value={b}>{b || "— None —"}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   <Select value={form.floor} onValueChange={(v) => setForm({ ...form, floor: v })}>
                     <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select Floor" /></SelectTrigger>
                     <SelectContent>
