@@ -13,7 +13,7 @@ type UserRole = Tables<"user_roles">;
 export default function AdminUsers() {
   const qc = useQueryClient();
 
-  const { data: roles, isLoading } = useQuery({
+  const { data: roles, isLoading, error } = useQuery({
     queryKey: ["user_roles"],
     queryFn: async () => {
       const { data, error } = await supabase.from("user_roles").select("*");
@@ -43,13 +43,20 @@ export default function AdminUsers() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">User Management</h2>
-        <p className="text-sm text-muted-foreground">{roles?.length ?? 0} registered users</p>
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? "Loading users..." : error ? "Users load nahi hue" : `${roles?.length ?? 0} registered users`}
+        </p>
       </div>
 
       <Card className="rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-lg font-semibold text-destructive">Users data load nahi ho paaya</p>
+              <p className="text-sm text-muted-foreground mt-1">Please login as admin and refresh once.</p>
+            </div>
           ) : !roles?.length ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-lg font-semibold">No users found</p>
