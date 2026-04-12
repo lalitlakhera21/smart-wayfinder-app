@@ -17,7 +17,7 @@ export default function AdminAnnouncements() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: announcements, isLoading } = useQuery({
+  const { data: announcements, isLoading, error } = useQuery({
     queryKey: ["announcements"],
     queryFn: async () => {
       const { data, error } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
@@ -29,8 +29,8 @@ export default function AdminAnnouncements() {
   const addAnnouncement = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const { error } = await supabase.from("announcements").insert({ title, message, created_by: user.id });
+      if (!user) throw new Error("Please login as admin first");
+      const { error } = await supabase.from("announcements").insert({ title: title.trim(), message: message.trim(), created_by: user.id });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -57,10 +57,13 @@ export default function AdminAnnouncements() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Announcements</h2>
-          <p className="text-sm text-muted-foreground">Notify students about changes</p>
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? "Loading announcements..." : error ? "Announcements load nahi hue" : `${announcements?.length ?? 0} announcements`}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Students ko ye home page ke top banner me dikhengi.</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -81,6 +84,13 @@ export default function AdminAnnouncements() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+      ) : error ? (
+        <Card className="rounded-2xl">
+          <CardContent className="py-12 text-center">
+            <p className="text-lg font-semibold text-destructive">Announcements load nahi ho paayi</p>
+            <p className="text-sm text-muted-foreground mt-1">Agar add karte waqt issue aaye, please dubara admin login karke try karo.</p>
+          </CardContent>
+        </Card>
       ) : !announcements?.length ? (
         <Card className="rounded-2xl">
           <CardContent className="py-12 text-center text-muted-foreground">

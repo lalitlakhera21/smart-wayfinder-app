@@ -1,23 +1,43 @@
 import { useRooms } from "@/hooks/useRooms";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, DoorOpen, Layers, Clock } from "lucide-react";
+import { Building2, DoorOpen, Layers, Clock, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function AdminDashboard() {
-  const { data: rooms } = useRooms();
+  const { data: rooms, isLoading, error } = useRooms();
 
-  const totalRooms = rooms?.length ?? 0;
-  const buildings = new Set(rooms?.map((r) => r.building)).size;
-  const floors = new Set(rooms?.map((r) => `${r.building}-${r.floor}`)).size;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const recentRooms = [...(rooms ?? [])]
+  if (error) {
+    return (
+      <Card className="rounded-2xl">
+        <CardContent className="py-10 text-center">
+          <p className="font-semibold text-destructive">Dashboard data load nahi ho paaya</p>
+          <p className="text-sm text-muted-foreground mt-1">Please refresh and try again.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const safeRooms = rooms ?? [];
+  const totalRooms = safeRooms.length;
+  const buildings = new Set(safeRooms.map((r) => r.building)).size;
+  const floors = new Set(safeRooms.map((r) => `${r.building}-${r.floor}`)).size;
+
+  const recentRooms = [...safeRooms]
     .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
     .slice(0, 5);
 
   const stats = [
     { label: "Total Rooms", value: totalRooms, icon: DoorOpen, color: "text-primary" },
     { label: "Buildings", value: buildings, icon: Building2, color: "text-accent" },
-    { label: "Floors", value: floors, icon: Layers, color: "text-[hsl(var(--nav-floor))]" },
+    { label: "Floors", value: floors, icon: Layers, color: "text-foreground" },
   ];
 
   return (
