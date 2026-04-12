@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import SearchBar from "@/components/SearchBar";
 import RoomCard from "@/components/RoomCard";
 import QuickSuggestions from "@/components/QuickSuggestions";
@@ -42,6 +43,10 @@ export default function Index() {
       <Header dark={dark} toggleTheme={toggle} />
 
       <main className="flex-1 flex flex-col items-center px-4 sm:px-6">
+        {/* Announcements */}
+        <div className="w-full mt-4">
+          <AnnouncementBanner />
+        </div>
         {/* Hero */}
         <div className="text-center mt-8 sm:mt-16 mb-8 relative">
           {/* Decorative elements */}
