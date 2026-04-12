@@ -28,7 +28,9 @@ export default function AdminAnnouncements() {
 
   const addAnnouncement = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("announcements").insert({ title, message });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const { error } = await supabase.from("announcements").insert({ title, message, created_by: user.id });
       if (error) throw error;
     },
     onSuccess: () => {
