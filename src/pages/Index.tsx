@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import SearchBar from "@/components/SearchBar";
 import RoomCard from "@/components/RoomCard";
 import QuickSuggestions from "@/components/QuickSuggestions";
