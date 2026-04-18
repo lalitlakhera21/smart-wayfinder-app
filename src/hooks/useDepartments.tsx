@@ -17,12 +17,10 @@ export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
-      console.log("[useDepartments] fetching...");
       const { data, error } = await supabase
         .from("departments")
         .select("*")
         .order("building_name", { ascending: true });
-      console.log("[useDepartments] result", { count: data?.length, error });
       if (error) throw error;
       return (data ?? []) as Department[];
     },
