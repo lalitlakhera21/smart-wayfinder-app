@@ -164,6 +164,18 @@ export default function AdminRooms() {
             {BUILDINGS.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[160px] rounded-xl">
+            <ShieldCheck className="h-4 w-4 mr-2 text-muted-foreground" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="verified">Verified</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card className="rounded-2xl overflow-hidden">
@@ -184,34 +196,83 @@ export default function AdminRooms() {
                     <TableHead>Building</TableHead>
                     <TableHead className="hidden sm:table-cell">Block</TableHead>
                     <TableHead className="hidden sm:table-cell">Floor</TableHead>
-                    <TableHead className="hidden md:table-cell">Direction</TableHead>
                     <TableHead className="hidden md:table-cell">Type</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((room) => (
-                    <TableRow key={room.id}>
-                      <TableCell className="font-semibold">{room.room}</TableCell>
-                      <TableCell>{room.building}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{room.block || "—"}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{room.floor}</TableCell>
-                      <TableCell className="hidden md:table-cell">{room.direction}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <span className="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">{room.type}</span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => handleEdit(room)}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:text-destructive" onClick={() => handleDelete(room.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {filtered.map((room) => {
+                    const status = (room.status ?? "pending") as RoomStatus;
+                    const updated = room.verified_at ?? room.updated_at;
+                    return (
+                      <TableRow key={room.id}>
+                        <TableCell className="font-semibold">
+                          {room.room}
+                          {updated && (
+                            <div className="text-[10px] text-muted-foreground font-normal mt-0.5">
+                              {formatDistanceToNow(new Date(updated), { addSuffix: true })}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>{room.building}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{room.block || "—"}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{room.floor}</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <span className="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">{room.type}</span>
+                        </TableCell>
+                        <TableCell>
+                          {status === "verified" && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                              <ShieldCheck className="h-3 w-3" /> Verified
+                            </span>
+                          )}
+                          {status === "pending" && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                              <Clock className="h-3 w-3" /> Pending
+                            </span>
+                          )}
+                          {status === "rejected" && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-destructive/10 text-destructive">
+                              <AlertCircle className="h-3 w-3" /> Rejected
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            {status !== "verified" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-lg text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                                title="Mark as verified"
+                                onClick={() => handleSetStatus(room.id, "verified")}
+                              >
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                            {status !== "rejected" && status !== "verified" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-lg text-muted-foreground"
+                                title="Reject"
+                                onClick={() => handleSetStatus(room.id, "rejected")}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => handleEdit(room)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:text-destructive" onClick={() => handleDelete(room.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
