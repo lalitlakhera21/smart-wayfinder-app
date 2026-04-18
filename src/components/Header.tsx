@@ -1,4 +1,4 @@
-import { MapPin, Shield } from "lucide-react";
+import { MapPin, Shield, FolderTree } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
 import { Link } from "react-router-dom";
@@ -24,6 +24,12 @@ export default function Header({ dark, toggleTheme }: Props) {
         </div>
       </Link>
       <div className="flex items-center gap-2">
+        <Link to="/departments">
+          <Button variant="ghost" size="sm" className="rounded-xl gap-2">
+            <FolderTree className="h-4 w-4" />
+            <span className="hidden sm:inline">Departments</span>
+          </Button>
+        </Link>
         <ThemeToggle dark={dark} toggle={toggleTheme} />
         <Link to={isAdmin ? "/admin" : "/login"}>
           <Button variant="outline" size="sm" className="rounded-xl gap-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200">

@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      departments: {
+        Row: {
+          building_name: string
+          category: string
+          created_at: string
+          id: string
+          program_name: string
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          building_name: string
+          category: string
+          created_at?: string
+          id?: string
+          program_name: string
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          building_name?: string
+          category?: string
+          created_at?: string
+          id?: string
+          program_name?: string
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       room_reports: {
         Row: {
           created_at: string

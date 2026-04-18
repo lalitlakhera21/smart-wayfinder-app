@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
@@ -16,13 +17,21 @@ import { useTheme } from "@/hooks/useTheme";
 import { SearchX, Navigation, Compass } from "lucide-react";
 
 export default function Index() {
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [filters, setFilters] = useState<{
     building: string | null;
     floor: string | null;
     type: string | null;
     verifiedOnly: boolean;
   }>({ building: null, floor: null, type: null, verifiedOnly: false });
+
+  // Sync URL ?q= -> state when it changes externally (e.g. coming from Departments page)
+  useEffect(() => {
+    const urlQ = searchParams.get("q") ?? "";
+    if (urlQ && urlQ !== query) setQuery(urlQ);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const results = useSearchRooms(query);
   const { data: rooms } = useRooms();
