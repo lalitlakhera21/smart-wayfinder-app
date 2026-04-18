@@ -90,8 +90,14 @@ export default function SubmitRoomDialog() {
       }
       const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase.from("room_submissions").insert({
-        ...parsed.data,
+        destination: parsed.data.destination,
+        building: parsed.data.building,
         block: parsed.data.block ?? "",
+        floor: parsed.data.floor,
+        room_type: parsed.data.room_type,
+        direction: parsed.data.direction,
+        submitter_name: parsed.data.submitter_name,
+        submitter_role: parsed.data.submitter_role,
         photo_url,
         submitter_user_id: user?.id ?? null,
       });
