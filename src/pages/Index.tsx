@@ -1,58 +1,70 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import SearchBar from "@/components/SearchBar";
+import SearchSuggestions from "@/components/SearchSuggestions";
 import RoomCard from "@/components/RoomCard";
-import QuickSuggestions from "@/components/QuickSuggestions";
+import QuickActions from "@/components/QuickActions";
 import RecentSearches from "@/components/RecentSearches";
 import CampusStats from "@/components/CampusStats";
-import FloorFilter from "@/components/FloorFilter";
+import SmartFilters from "@/components/SmartFilters";
+import SubmitRoomDialog from "@/components/SubmitRoomDialog";
 import { useSearchRooms, useRooms } from "@/hooks/useRooms";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useTheme } from "@/hooks/useTheme";
-import { SearchX, MapPin, Navigation, Compass } from "lucide-react";
+import { SearchX, Navigation, Compass } from "lucide-react";
 
 export default function Index() {
   const [query, setQuery] = useState("");
-  const [floorFilter, setFloorFilter] = useState<string | null>(null);
+  const [filters, setFilters] = useState<{
+    building: string | null;
+    floor: string | null;
+    type: string | null;
+  }>({ building: null, floor: null, type: null });
+
   const results = useSearchRooms(query);
   const { data: rooms } = useRooms();
   const { recent, add, clear } = useRecentSearches();
   const { dark, toggle } = useTheme();
 
-  const filteredResults = floorFilter
-    ? results.filter((r) => r.floor === floorFilter)
-    : results;
+  const filteredResults = useMemo(() => {
+    return results.filter((r) => {
+      if (filters.building && r.building !== filters.building) return false;
+      if (filters.floor && r.floor !== filters.floor) return false;
+      if (filters.type && r.type !== filters.type) return false;
+      return true;
+    });
+  }, [results, filters]);
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    setFloorFilter(null);
+    setFilters({ building: null, floor: null, type: null });
     if (q.trim()) {
       add(q);
       supabase.from("search_logs").insert({ query: q.trim() }).then(() => {});
     }
   }, [add]);
 
-  const uniqueFloors = query.trim()
-    ? [...new Set(results.map((r) => r.floor))]
-    : [];
+  const updateFilter = (k: "building" | "floor" | "type", v: string | null) =>
+    setFilters((p) => ({ ...p, [k]: v }));
+
+  const clearFilters = () => setFilters({ building: null, floor: null, type: null });
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header dark={dark} toggleTheme={toggle} />
 
       <main className="flex-1 flex flex-col items-center px-4 sm:px-6">
-        {/* Announcements */}
         <div className="w-full mt-4">
           <AnnouncementBanner />
         </div>
+
         {/* Hero */}
         <div className="text-center mt-8 sm:mt-16 mb-8 relative">
-          {/* Decorative elements */}
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute top-10 -left-20 w-32 h-32 bg-accent/5 rounded-full blur-2xl pointer-events-none" />
-          
+
           <div className="relative">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 animate-in fade-in slide-in-from-bottom-2">
               <Navigation className="h-4 w-4 animate-pulse" />
@@ -76,13 +88,23 @@ export default function Index() {
           resultCount={query.trim() ? filteredResults.length : undefined}
         />
 
-        {/* Floor Filter */}
-        {uniqueFloors.length > 1 && (
-          <FloorFilter
-            floors={uniqueFloors}
-            selected={floorFilter}
-            onSelect={setFloorFilter}
-          />
+        {/* Autocomplete suggestions */}
+        {query.trim() && (
+          <SearchSuggestions query={query} rooms={rooms ?? []} onSelect={handleSearch} />
+        )}
+
+        {/* Smart filters when searching */}
+        {query.trim() && results.length > 0 && (
+          <div className="w-full mt-4">
+            <SmartFilters
+              rooms={results}
+              building={filters.building}
+              floor={filters.floor}
+              type={filters.type}
+              onChange={updateFilter}
+              onClear={clearFilters}
+            />
+          </div>
         )}
 
         {/* Results */}
@@ -93,7 +115,10 @@ export default function Index() {
                 <SearchX className="h-8 w-8 text-muted-foreground/50" />
               </div>
               <p className="text-lg font-semibold text-foreground">Room not found</p>
-              <p className="text-muted-foreground text-sm mt-1">Please check the room code and try again.</p>
+              <p className="text-muted-foreground text-sm mt-1 mb-4">
+                Agar yeh location actually exist karti hai, please add karein.
+              </p>
+              <SubmitRoomDialog />
             </div>
           )}
           {filteredResults.map((room, i) => (
@@ -108,12 +133,23 @@ export default function Index() {
           )}
         </div>
 
-        {/* Suggestions, Stats & Recent (when no query) */}
+        {/* Home view (no query) */}
         {!query.trim() && (
           <div className="w-full mt-8 space-y-8 pb-8">
             <CampusStats rooms={rooms ?? []} />
-            <QuickSuggestions onSelect={handleSearch} />
+            <QuickActions onAction={handleSearch} />
             <RecentSearches recent={recent} onSelect={handleSearch} onClear={clear} />
+
+            {/* Crowd contribution CTA */}
+            <div className="w-full max-w-2xl mx-auto glass-card rounded-2xl p-5 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <p className="font-semibold text-foreground">Koi room missing hai?</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Students aur faculty naye destinations submit kar sakte hain. Admin verify karega.
+                </p>
+              </div>
+              <SubmitRoomDialog />
+            </div>
           </div>
         )}
       </main>
