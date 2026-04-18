@@ -72,6 +72,19 @@ export default function SmartFilters({ rooms, building, floor, type, verifiedOnl
       <Section icon={Building2} label="Building" options={buildings} value={building} onSelect={(v) => onChange("building", v)} />
       <Section icon={Layers} label="Floor" options={floors} value={floor} onSelect={(v) => onChange("floor", v)} />
       <Section icon={Tag} label="Type" options={types} value={type} onSelect={(v) => onChange("type", v)} />
+      <div className="pt-1">
+        <button
+          onClick={() => onToggleVerified(!verifiedOnly)}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+            verifiedOnly
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
+              : "bg-secondary text-secondary-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400"
+          }`}
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Verified only
+        </button>
+      </div>
     </div>
   );
 }

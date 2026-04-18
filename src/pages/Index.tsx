@@ -21,7 +21,8 @@ export default function Index() {
     building: string | null;
     floor: string | null;
     type: string | null;
-  }>({ building: null, floor: null, type: null });
+    verifiedOnly: boolean;
+  }>({ building: null, floor: null, type: null, verifiedOnly: false });
 
   const results = useSearchRooms(query);
   const { data: rooms } = useRooms();
@@ -33,13 +34,14 @@ export default function Index() {
       if (filters.building && r.building !== filters.building) return false;
       if (filters.floor && r.floor !== filters.floor) return false;
       if (filters.type && r.type !== filters.type) return false;
+      if (filters.verifiedOnly && r.status !== "verified") return false;
       return true;
     });
   }, [results, filters]);
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    setFilters({ building: null, floor: null, type: null });
+    setFilters({ building: null, floor: null, type: null, verifiedOnly: false });
     if (q.trim()) {
       add(q);
       supabase.from("search_logs").insert({ query: q.trim() }).then(() => {});
@@ -49,7 +51,9 @@ export default function Index() {
   const updateFilter = (k: "building" | "floor" | "type", v: string | null) =>
     setFilters((p) => ({ ...p, [k]: v }));
 
-  const clearFilters = () => setFilters({ building: null, floor: null, type: null });
+  const toggleVerified = (v: boolean) => setFilters((p) => ({ ...p, verifiedOnly: v }));
+
+  const clearFilters = () => setFilters({ building: null, floor: null, type: null, verifiedOnly: false });
 
   return (
     <div className="min-h-screen flex flex-col">
