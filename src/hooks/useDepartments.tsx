@@ -17,13 +17,18 @@ export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
+      console.log("[useDepartments] queryFn START");
       const { data, error } = await supabase
         .from("departments")
         .select("*")
         .order("building_name", { ascending: true });
+      console.log("[useDepartments] queryFn DONE", { rows: data?.length, error });
       if (error) throw error;
       return (data ?? []) as Department[];
     },
+    retry: 1,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 }
 
