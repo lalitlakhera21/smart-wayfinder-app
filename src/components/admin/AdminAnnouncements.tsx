@@ -35,12 +35,13 @@ export default function AdminAnnouncements() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["announcements"] });
+      qc.invalidateQueries({ queryKey: ["active-announcements"] });
       setTitle("");
       setMessage("");
       setDialogOpen(false);
       toast.success("Announcement published");
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(e.message ?? "Failed. Please login as admin."),
   });
 
   const deleteAnnouncement = useMutation({
@@ -50,6 +51,7 @@ export default function AdminAnnouncements() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["announcements"] });
+      qc.invalidateQueries({ queryKey: ["active-announcements"] });
       toast.success("Announcement deleted");
     },
     onError: (e: any) => toast.error(e.message),
