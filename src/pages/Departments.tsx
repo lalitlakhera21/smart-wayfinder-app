@@ -9,6 +9,9 @@ import { useDepartments } from "@/hooks/useDepartments";
 import Header from "@/components/Header";
 import { useTheme } from "@/hooks/useTheme";
 
+const normalizeDepartmentSearch = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+
 export default function Departments() {
   const { data: depts = [], isLoading } = useDepartments();
   const { dark, toggle } = useTheme();
@@ -28,11 +31,11 @@ export default function Departments() {
   }, [depts, building]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = normalizeDepartmentSearch(query);
     return depts.filter((d) => {
       if (building !== "all" && d.building_name !== building) return false;
       if (category !== "all" && d.category !== category) return false;
-      if (q && !d.program_name.toLowerCase().includes(q)) return false;
+      if (q && !normalizeDepartmentSearch(d.program_name).includes(q)) return false;
       return true;
     });
   }, [depts, building, category, query]);
