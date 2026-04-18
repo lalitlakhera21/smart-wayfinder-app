@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useRooms, useAddRoom, useUpdateRoom, useDeleteRoom, type Room } from "@/hooks/useRooms";
+import { useRooms, useAddRoom, useUpdateRoom, useDeleteRoom, useSetRoomStatus, type Room, type RoomStatus } from "@/hooks/useRooms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Loader2, Search, Filter } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search, Filter, ShieldCheck, Clock, AlertCircle, X } from "lucide-react";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 const BUILDINGS = ["Tech Block", "Admin Block", "Academic Block"];
 const BLOCKS = ["", "Management Block", "Science Block", "Engineering Block", "Library Block"];
@@ -31,12 +32,14 @@ export default function AdminRooms() {
   const addRoom = useAddRoom();
   const updateRoom = useUpdateRoom();
   const deleteRoom = useDeleteRoom();
+  const setStatus = useSetRoomStatus();
 
   const [form, setForm] = useState<RoomFormData>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterBuilding, setFilterBuilding] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
   const filtered = (rooms ?? []).filter((r) => {
     const matchSearch = !search.trim() ||
@@ -44,8 +47,24 @@ export default function AdminRooms() {
       r.building.toLowerCase().includes(search.toLowerCase()) ||
       r.block.toLowerCase().includes(search.toLowerCase());
     const matchBuilding = filterBuilding === "all" || r.building === filterBuilding;
-    return matchSearch && matchBuilding;
+    const matchStatus = filterStatus === "all" || (r.status ?? "pending") === filterStatus;
+    return matchSearch && matchBuilding && matchStatus;
   });
+
+  const counts = {
+    verified: (rooms ?? []).filter((r) => r.status === "verified").length,
+    pending: (rooms ?? []).filter((r) => (r.status ?? "pending") === "pending").length,
+    rejected: (rooms ?? []).filter((r) => r.status === "rejected").length,
+  };
+
+  const handleSetStatus = async (id: string, status: RoomStatus) => {
+    try {
+      await setStatus.mutateAsync({ id, status });
+      toast.success(`Marked as ${status}`);
+    } catch (e: any) {
+      toast.error(e.message || "Failed. Login as admin?");
+    }
+  };
 
   const handleSubmit = async () => {
     if (!form.building || !form.floor || !form.room || !form.direction || !form.type) {
@@ -89,7 +108,9 @@ export default function AdminRooms() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Room Management</h2>
-          <p className="text-sm text-muted-foreground">{rooms?.length ?? 0} rooms total</p>
+          <p className="text-sm text-muted-foreground">
+            {rooms?.length ?? 0} total · <span className="text-emerald-600 dark:text-emerald-400">{counts.verified} verified</span> · <span className="text-amber-600 dark:text-amber-400">{counts.pending} pending</span>{counts.rejected ? <> · <span className="text-destructive">{counts.rejected} rejected</span></> : null}
+          </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) { setForm(emptyForm); setEditingId(null); } }}>
           <DialogTrigger asChild>
