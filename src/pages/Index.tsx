@@ -105,7 +105,9 @@ export default function Index() {
               building={filters.building}
               floor={filters.floor}
               type={filters.type}
+              verifiedOnly={filters.verifiedOnly}
               onChange={updateFilter}
+              onToggleVerified={toggleVerified}
               onClear={clearFilters}
             />
           </div>
