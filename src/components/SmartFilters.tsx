@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Building2, Layers, Tag, X } from "lucide-react";
+import { Building2, Layers, Tag, X, ShieldCheck } from "lucide-react";
 import type { Room } from "@/hooks/useRooms";
 
 interface Props {
@@ -7,16 +7,18 @@ interface Props {
   building: string | null;
   floor: string | null;
   type: string | null;
+  verifiedOnly: boolean;
   onChange: (k: "building" | "floor" | "type", v: string | null) => void;
+  onToggleVerified: (v: boolean) => void;
   onClear: () => void;
 }
 
-export default function SmartFilters({ rooms, building, floor, type, onChange, onClear }: Props) {
+export default function SmartFilters({ rooms, building, floor, type, verifiedOnly, onChange, onToggleVerified, onClear }: Props) {
   const buildings = useMemo(() => [...new Set(rooms.map((r) => r.building))].sort(), [rooms]);
   const floors = useMemo(() => [...new Set(rooms.map((r) => r.floor))].sort(), [rooms]);
   const types = useMemo(() => [...new Set(rooms.map((r) => r.type))].sort(), [rooms]);
 
-  const active = !!(building || floor || type);
+  const active = !!(building || floor || type || verifiedOnly);
 
   const Section = ({
     icon: Icon,
@@ -70,6 +72,19 @@ export default function SmartFilters({ rooms, building, floor, type, onChange, o
       <Section icon={Building2} label="Building" options={buildings} value={building} onSelect={(v) => onChange("building", v)} />
       <Section icon={Layers} label="Floor" options={floors} value={floor} onSelect={(v) => onChange("floor", v)} />
       <Section icon={Tag} label="Type" options={types} value={type} onSelect={(v) => onChange("type", v)} />
+      <div className="pt-1">
+        <button
+          onClick={() => onToggleVerified(!verifiedOnly)}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+            verifiedOnly
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
+              : "bg-secondary text-secondary-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400"
+          }`}
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Verified only
+        </button>
+      </div>
     </div>
   );
 }

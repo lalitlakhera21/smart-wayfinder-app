@@ -1,8 +1,10 @@
-import { Building2, DoorOpen, FlaskConical, Briefcase, BookOpen, Coffee, Mic2, GraduationCap, ShieldCheck, Clock, AlertCircle } from "lucide-react";
+import { Building2, DoorOpen, FlaskConical, Briefcase, BookOpen, Coffee, Mic2, GraduationCap, ShieldCheck, Clock, AlertCircle, ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Room } from "@/hooks/useRooms";
 import NavigationSteps from "./NavigationSteps";
+import ReportIssueDialog from "./ReportIssueDialog";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
 
 const typeIcons: Record<string, typeof Building2> = {
   Classroom: GraduationCap,
@@ -52,12 +54,34 @@ export default function RoomCard({ room, onClick }: { room: Room; onClick?: () =
   const status = room.status ?? "pending";
   const updatedRaw = room.verified_at ?? room.updated_at;
   const updatedLabel = updatedRaw ? formatDistanceToNow(new Date(updatedRaw), { addSuffix: true }) : null;
+  const [imgError, setImgError] = useState(false);
+  const showPhoto = room.photo_url && !imgError;
 
   return (
     <Card
-      className="glass-card rounded-2xl cursor-pointer hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 group"
+      className="glass-card rounded-2xl overflow-hidden cursor-pointer hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 group"
       onClick={onClick}
     >
+      {/* Hero photo (route card style) */}
+      {showPhoto && (
+        <div className="relative h-40 sm:h-48 w-full bg-muted overflow-hidden">
+          <img
+            src={room.photo_url!}
+            alt={`${room.room} entrance`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-background/80 backdrop-blur text-foreground">
+              <ImageIcon className="h-3 w-3" /> Photo confirmed
+            </span>
+            <StatusBadge status={status} />
+          </div>
+        </div>
+      )}
+
       <CardContent className="p-5 sm:p-6">
         <div className="flex items-start justify-between mb-3 gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -67,7 +91,7 @@ export default function RoomCard({ room, onClick }: { room: Room; onClick?: () =
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg font-bold text-foreground leading-tight">{room.room}</h3>
-                <StatusBadge status={status} />
+                {!showPhoto && <StatusBadge status={status} />}
               </div>
               <p className="text-xs text-muted-foreground truncate">
                 {room.building}
@@ -91,6 +115,10 @@ export default function RoomCard({ room, onClick }: { room: Room; onClick?: () =
         )}
 
         <NavigationSteps room={room} />
+
+        <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-end">
+          <ReportIssueDialog roomId={room.id} roomName={room.room} />
+        </div>
       </CardContent>
     </Card>
   );

@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
+  isFaculty: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -16,14 +17,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isFaculty, setIsFaculty] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(!!data);
+  const checkRoles = async (userId: string) => {
+    const [admin, faculty] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: userId, _role: "faculty" as any }),
+    ]);
+    setIsAdmin(!!admin.data);
+    setIsFaculty(!!faculty.data);
   };
 
   useEffect(() => {
@@ -31,9 +34,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (_event, session) => {
         setUser(session?.user ?? null);
         if (session?.user) {
-          await checkAdmin(session.user.id);
+          await checkRoles(session.user.id);
         } else {
           setIsAdmin(false);
+          setIsFaculty(false);
         }
         setLoading(false);
       }
@@ -42,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        await checkAdmin(session.user.id);
+        await checkRoles(session.user.id);
       }
       setLoading(false);
     });
@@ -65,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, isFaculty, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

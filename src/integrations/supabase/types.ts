@@ -44,6 +44,50 @@ export type Database = {
         }
         Relationships: []
       }
+      room_reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          reporter_name: string | null
+          reporter_user_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          room_id: string
+          status: Database["public"]["Enums"]["report_status"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          reporter_name?: string | null
+          reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          room_id: string
+          status?: Database["public"]["Enums"]["report_status"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          reporter_name?: string | null
+          reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          room_id?: string
+          status?: Database["public"]["Enums"]["report_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_reports_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_submissions: {
         Row: {
           block: string
@@ -112,6 +156,7 @@ export type Database = {
           direction: string
           floor: string
           id: string
+          photo_url: string | null
           room: string
           status: Database["public"]["Enums"]["room_status"]
           type: string
@@ -126,6 +171,7 @@ export type Database = {
           direction: string
           floor: string
           id?: string
+          photo_url?: string | null
           room: string
           status?: Database["public"]["Enums"]["room_status"]
           type?: string
@@ -140,6 +186,7 @@ export type Database = {
           direction?: string
           floor?: string
           id?: string
+          photo_url?: string | null
           room?: string
           status?: Database["public"]["Enums"]["room_status"]
           type?: string
@@ -210,7 +257,8 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "faculty"
+      report_status: "open" | "resolved" | "dismissed"
       room_status: "pending" | "verified" | "rejected"
       submission_status: "pending" | "approved" | "rejected"
     }
@@ -340,7 +388,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "faculty"],
+      report_status: ["open", "resolved", "dismissed"],
       room_status: ["pending", "verified", "rejected"],
       submission_status: ["pending", "approved", "rejected"],
     },

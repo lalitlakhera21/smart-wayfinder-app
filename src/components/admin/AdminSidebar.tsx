@@ -1,4 +1,4 @@
-import { LayoutDashboard, DoorOpen, Users, BarChart3, Megaphone, LogOut, MapPin, Inbox } from "lucide-react";
+import { LayoutDashboard, DoorOpen, Users, BarChart3, Megaphone, LogOut, MapPin, Inbox, Flag } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,6 +19,7 @@ const items = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Rooms", url: "/admin/rooms", icon: DoorOpen },
   { title: "Submissions", url: "/admin/submissions", icon: Inbox },
+  { title: "Reports", url: "/admin/reports", icon: Flag },
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Announcements", url: "/admin/announcements", icon: Megaphone },
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
