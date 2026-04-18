@@ -44,6 +44,66 @@ export type Database = {
         }
         Relationships: []
       }
+      room_submissions: {
+        Row: {
+          block: string
+          building: string
+          created_at: string
+          destination: string
+          direction: string
+          floor: string
+          id: string
+          photo_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          room_type: string
+          status: Database["public"]["Enums"]["submission_status"]
+          submitter_name: string
+          submitter_role: string
+          submitter_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          block?: string
+          building: string
+          created_at?: string
+          destination: string
+          direction: string
+          floor: string
+          id?: string
+          photo_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          room_type?: string
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitter_name: string
+          submitter_role?: string
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          block?: string
+          building?: string
+          created_at?: string
+          destination?: string
+          direction?: string
+          floor?: string
+          id?: string
+          photo_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          room_type?: string
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitter_name?: string
+          submitter_role?: string
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rooms: {
         Row: {
           block: string
@@ -142,6 +202,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      submission_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -270,6 +331,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      submission_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
