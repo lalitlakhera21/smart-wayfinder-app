@@ -20,9 +20,7 @@ export function useDepartments() {
       const { data, error } = await supabase
         .from("departments")
         .select("*")
-        .order("building_name")
-        .order("category")
-        .order("program_name");
+        .order("building_name", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Department[];
     },

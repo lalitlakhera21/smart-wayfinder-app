@@ -2,13 +2,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// PWA service worker registration — guarded against iframe & Lovable preview hosts
 const isInIframe = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
+  try { return window.self !== window.top; } catch { return true; }
 })();
 
 const isPreviewHost =
@@ -18,20 +13,23 @@ const isPreviewHost =
     window.location.hostname.includes("lovable.dev"));
 
 if (isPreviewHost || isInIframe) {
-  // Unregister any existing service workers in preview/iframe contexts
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((regs) => {
-      regs.forEach((r) => r.unregister());
+    navigator.serviceWorker.getRegistrations().then(async (regs) => {
+      const hadSW = regs.length > 0;
+      await Promise.all(regs.map((r) => r.unregister()));
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if (hadSW && navigator.serviceWorker.controller) {
+        window.location.reload();
+      }
     });
   }
 } else if ("serviceWorker" in navigator) {
   import("virtual:pwa-register")
-    .then(({ registerSW }) => {
-      registerSW({ immediate: true });
-    })
-    .catch(() => {
-      /* PWA register unavailable — fail silently */
-    });
+    .then(({ registerSW }) => registerSW({ immediate: true }))
+    .catch(() => {});
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
