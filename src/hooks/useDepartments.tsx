@@ -17,19 +17,15 @@ export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
-      console.log("[useDepartments] queryFn START");
       const url =
         import.meta.env.VITE_SUPABASE_URL +
         "/rest/v1/departments?select=*&order=building_name.asc";
       const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-      console.log("[useDepartments] fetching", url);
       const res = await fetch(url, {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
       });
-      console.log("[useDepartments] response", res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as Department[];
-      console.log("[useDepartments] queryFn DONE", { rows: data.length });
       return data;
     },
     retry: 1,
