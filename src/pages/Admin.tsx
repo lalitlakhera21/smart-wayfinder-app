@@ -10,6 +10,7 @@ import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import AdminSubmissions from "@/components/admin/AdminSubmissions";
 import AdminReports from "@/components/admin/AdminReports";
+import AdminDepartments from "@/components/admin/AdminDepartments";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Loader2, MapPin } from "lucide-react";
 
@@ -31,6 +32,7 @@ export default function AdminLayout({ section = "dashboard" }: AdminLayoutProps)
       case "analytics": return <AdminAnalytics />;
       case "submissions": return <AdminSubmissions />;
       case "reports": return <AdminReports />;
+      case "departments": return <AdminDepartments />;
       default: return <AdminDashboard />;
     }
   };
