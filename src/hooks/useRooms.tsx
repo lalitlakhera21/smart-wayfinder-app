@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
 export type Room = Tables<"rooms">;
+export type RoomStatus = "pending" | "verified" | "rejected";
 
 export function useRooms() {
   return useQuery({
@@ -55,6 +56,23 @@ export function useDeleteRoom() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("rooms").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["rooms"] }),
+  });
+}
+
+export function useSetRoomStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: RoomStatus }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const updates: TablesUpdate<"rooms"> = {
+        status,
+        verified_by: status === "verified" ? user?.id ?? null : null,
+        verified_at: status === "verified" ? new Date().toISOString() : null,
+      };
+      const { error } = await supabase.from("rooms").update(updates).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["rooms"] }),

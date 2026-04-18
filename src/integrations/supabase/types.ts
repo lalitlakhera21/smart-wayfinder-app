@@ -113,8 +113,11 @@ export type Database = {
           floor: string
           id: string
           room: string
+          status: Database["public"]["Enums"]["room_status"]
           type: string
           updated_at: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           block?: string
@@ -124,8 +127,11 @@ export type Database = {
           floor: string
           id?: string
           room: string
+          status?: Database["public"]["Enums"]["room_status"]
           type?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           block?: string
@@ -135,8 +141,11 @@ export type Database = {
           floor?: string
           id?: string
           room?: string
+          status?: Database["public"]["Enums"]["room_status"]
           type?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -202,6 +211,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      room_status: "pending" | "verified" | "rejected"
       submission_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -331,6 +341,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      room_status: ["pending", "verified", "rejected"],
       submission_status: ["pending", "approved", "rejected"],
     },
   },
