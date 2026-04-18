@@ -26,6 +26,46 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="CampusNav" />
   <link rel="apple-touch-icon" href="/pwa-192.png" />
+  <script>
+    // PWA SW killer for preview/iframe — runs before any module loads.
+    (function () {
+      try {
+        var inIframe = false;
+        try { inIframe = window.self !== window.top; } catch (e) { inIframe = true; }
+        var host = window.location.hostname;
+        var isPreview =
+          host.indexOf("id-preview--") !== -1 ||
+          host.indexOf("lovableproject.com") !== -1 ||
+          host.indexOf("lovable.dev") !== -1;
+        if ((inIframe || isPreview) && "serviceWorker" in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            var hadSW = regs.length > 0;
+            Promise.all(regs.map(function (r) { return r.unregister(); })).then(function () {
+              if ("caches" in window) {
+                caches.keys().then(function (keys) {
+                  Promise.all(keys.map(function (k) { return caches.delete(k); })).then(function () {
+                    if (hadSW) {
+                      var key = "__sw_killed_reload__";
+                      if (!sessionStorage.getItem(key)) {
+                        sessionStorage.setItem(key, "1");
+                        window.location.reload();
+                      }
+                    }
+                  });
+                });
+              } else if (hadSW) {
+                var key2 = "__sw_killed_reload__";
+                if (!sessionStorage.getItem(key2)) {
+                  sessionStorage.setItem(key2, "1");
+                  window.location.reload();
+                }
+              }
+            });
+          }).catch(function () {});
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
   <body>

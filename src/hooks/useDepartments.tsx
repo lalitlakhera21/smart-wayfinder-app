@@ -17,13 +17,20 @@ export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("departments")
-        .select("*")
-        .order("building_name", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as Department[];
+      const url =
+        import.meta.env.VITE_SUPABASE_URL +
+        "/rest/v1/departments?select=*&order=building_name.asc";
+      const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+      const res = await fetch(url, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as Department[];
+      return data;
     },
+    retry: 1,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 }
 
