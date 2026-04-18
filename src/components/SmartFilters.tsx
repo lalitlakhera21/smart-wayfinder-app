@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Building2, Layers, Tag, X } from "lucide-react";
+import { Building2, Layers, Tag, X, ShieldCheck } from "lucide-react";
 import type { Room } from "@/hooks/useRooms";
 
 interface Props {
@@ -7,16 +7,18 @@ interface Props {
   building: string | null;
   floor: string | null;
   type: string | null;
+  verifiedOnly: boolean;
   onChange: (k: "building" | "floor" | "type", v: string | null) => void;
+  onToggleVerified: (v: boolean) => void;
   onClear: () => void;
 }
 
-export default function SmartFilters({ rooms, building, floor, type, onChange, onClear }: Props) {
+export default function SmartFilters({ rooms, building, floor, type, verifiedOnly, onChange, onToggleVerified, onClear }: Props) {
   const buildings = useMemo(() => [...new Set(rooms.map((r) => r.building))].sort(), [rooms]);
   const floors = useMemo(() => [...new Set(rooms.map((r) => r.floor))].sort(), [rooms]);
   const types = useMemo(() => [...new Set(rooms.map((r) => r.type))].sort(), [rooms]);
 
-  const active = !!(building || floor || type);
+  const active = !!(building || floor || type || verifiedOnly);
 
   const Section = ({
     icon: Icon,
