@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
 import Header from "@/components/Header";
@@ -32,8 +32,9 @@ export default function Navigate() {
   const [search, setSearch] = useState("");
   const { dark, toggle } = useTheme();
 
-  // Refresh defaults once data loads
-  if (!fromId && defaultFrom) setFromId(defaultFrom);
+  useEffect(() => {
+    if (!fromId && defaultFrom) setFromId(defaultFrom);
+  }, [fromId, defaultFrom]);
 
   const fromOptions = useMemo(
     () => locations.filter((l) => ["gate", "landmark", "building"].includes(l.type)),
