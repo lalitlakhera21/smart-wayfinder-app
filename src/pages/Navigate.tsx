@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import RouteCard from "@/components/RouteCard";
 import RouteMiniMap from "@/components/RouteMiniMap";
+import CampusMap from "@/components/CampusMap";
 import { useLocations, useConnections } from "@/hooks/useLocations";
 import { buildGraph, findShortestPath } from "@/lib/navigation";
 
@@ -82,6 +83,8 @@ export default function Navigate() {
             Pick where you are and where you want to go — we'll build the route.
           </p>
         </div>
+
+        <CampusMap compact />
 
         <Card className="p-5 space-y-4">
           <div className="space-y-2">

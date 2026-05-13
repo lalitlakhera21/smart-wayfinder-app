@@ -12,6 +12,7 @@ import CampusStats from "@/components/CampusStats";
 import SmartFilters from "@/components/SmartFilters";
 import SubmitRoomDialog from "@/components/SubmitRoomDialog";
 import NavigateWidget from "@/components/NavigateWidget";
+import CampusMap from "@/components/CampusMap";
 import { useSearchRooms, useRooms } from "@/hooks/useRooms";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useTheme } from "@/hooks/useTheme";
@@ -105,6 +106,11 @@ export default function Index() {
         {/* Smart Navigate widget (Google Maps style: From → To) */}
         <div className="w-full mb-4">
           <NavigateWidget />
+        </div>
+
+        {/* Campus map */}
+        <div className="w-full max-w-2xl mx-auto mb-4">
+          <CampusMap compact />
         </div>
 
         {/* Or search by room code */}
