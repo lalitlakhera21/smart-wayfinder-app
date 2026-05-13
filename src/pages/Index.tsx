@@ -11,6 +11,7 @@ import RecentSearches from "@/components/RecentSearches";
 import CampusStats from "@/components/CampusStats";
 import SmartFilters from "@/components/SmartFilters";
 import SubmitRoomDialog from "@/components/SubmitRoomDialog";
+import NavigateWidget from "@/components/NavigateWidget";
 import { useSearchRooms, useRooms } from "@/hooks/useRooms";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useTheme } from "@/hooks/useTheme";
