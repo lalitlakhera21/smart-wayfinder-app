@@ -74,6 +74,113 @@ export type Database = {
         }
         Relationships: []
       }
+      location_connections: {
+        Row: {
+          created_at: string
+          direction: string
+          distance_m: number
+          estimated_seconds: number
+          from_location_id: string
+          id: string
+          instruction: string | null
+          to_location_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          direction?: string
+          distance_m?: number
+          estimated_seconds?: number
+          from_location_id: string
+          id?: string
+          instruction?: string | null
+          to_location_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          distance_m?: number
+          estimated_seconds?: number
+          from_location_id?: string
+          id?: string
+          instruction?: string | null
+          to_location_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_connections_from_location_id_fkey"
+            columns: ["from_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_connections_to_location_id_fkey"
+            columns: ["to_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          block: string | null
+          building: string | null
+          created_at: string
+          description: string | null
+          floor: string | null
+          id: string
+          is_verified: boolean
+          name: string
+          photo_url: string | null
+          room_id: string | null
+          type: string
+          updated_at: string
+          wing: string | null
+        }
+        Insert: {
+          block?: string | null
+          building?: string | null
+          created_at?: string
+          description?: string | null
+          floor?: string | null
+          id?: string
+          is_verified?: boolean
+          name: string
+          photo_url?: string | null
+          room_id?: string | null
+          type?: string
+          updated_at?: string
+          wing?: string | null
+        }
+        Update: {
+          block?: string | null
+          building?: string | null
+          created_at?: string
+          description?: string | null
+          floor?: string | null
+          id?: string
+          is_verified?: boolean
+          name?: string
+          photo_url?: string | null
+          room_id?: string | null
+          type?: string
+          updated_at?: string
+          wing?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_reports: {
         Row: {
           created_at: string

@@ -1,54 +1,70 @@
+## Smart Campus Navigation — Dynamic Routing Upgrade
 
-Goal: student home page par announcement clearly dikhana aur admin side se add/view flow ko properly work karwana.
+Replace the current hardcoded step generator with a graph-based navigation engine backed by two new tables: `locations` (nodes) and `location_connections` (edges). Use BFS shortest-path on the graph to build routes dynamically.
 
-What I found:
-- Backend me 1 active announcement already present hai.
-- Code ke hisaab se announcement `/` page par header ke neeche, hero section ke upar dikhna chahiye.
-- Browser check me top par announcement ka container present hai, but empty aa raha hai.
-- Admin announcements page bhi “Loading announcements...” par atak rahi hai.
-- Iska matlab problem sirf banner styling ki nahi hai; frontend ke data queries complete hi nahi ho rahe.
-- Ek aur separate issue: admin page ko direct open kar diya gaya hai, lekin backend abhi bhi sirf real admin role ko announcement create/delete karne deta hai. Isliye “add announcement” fail hona expected hai.
+### 1. Database (migration)
 
-Implementation plan:
-1. Fix shared data-loading path
-   - Home aur admin dono me jo backend reads use ho rahe hain unka common failure point trace karunga.
-   - `rooms` aur `announcements` dono ke fetch flow ko align karunga taaki pending state me latakne ke bajay proper success/error aaye.
-   - Generated backend client file ko touch nahi karunga; app-side integration aur query flow ko fix karunga.
+**`locations`** — every navigable point (gate, building, block, floor-corridor, stairs, lift, room, office)
+- `id` uuid pk
+- `name` text (e.g. "Main Gate", "Academic Block – Ground Floor Corridor", "HOD JMC Office")
+- `type` text — `gate | building | block | floor | corridor | stairs | lift | room | office | landmark`
+- `building` text nullable
+- `block` text nullable
+- `floor` text nullable
+- `wing` text nullable
+- `description` text nullable
+- `photo_url` text nullable
+- `is_verified` bool default true
+- `room_id` uuid nullable (links to existing `rooms` when applicable)
 
-2. Make announcement banner debuggable and visible
-   - `AnnouncementBanner` me explicit `isLoading`, `error`, aur empty-state handling add karunga.
-   - Silent `return null` behavior hataunga jab request fail ho, taaki blank gap na dikhe.
-   - Banner ko thoda more prominent banaunga so students clearly dekh saken.
+**`location_connections`** — directed edges
+- `id` uuid pk
+- `from_location_id` uuid fk → locations
+- `to_location_id` uuid fk → locations
+- `direction` text — `Straight | Left | Right | Up | Down`
+- `distance_m` int default 10
+- `estimated_seconds` int default 30
+- `instruction` text nullable (e.g. "Take stairs up to 4th floor")
 
-3. Fix admin announcement creation flow safely
-   - Current mismatch clear hai: page open hai, but write permission admin-only hai.
-   - Main admin UI ko backend rules ke saath sync karunga:
-     - ya to write actions ke liye proper login/admin check dikhaya jayega,
-     - ya clear message diya jayega ki create/delete ke liye admin auth zaroori hai.
-   - Security ke liye announcement insert/update/delete sabke liye open nahi kiya jayega.
+Both edges inserted as a pair (A→B and B→A) so graph is bidirectional but each direction can carry its own instruction (e.g. "Up" vs "Down" for stairs).
 
-4. Refresh + cache sync
-   - Admin se announcement add/delete hone par student banner query bhi refetch/invalidate hogi.
-   - Taaki naya announcement turant home page par reflect ho.
+RLS: public read; admin-only write. Triggers for `updated_at`.
 
-5. End-to-end verification
-   - `/admin/announcements` par list load ho
-   - test announcement create ho
-   - `/` par banner header ke neeche dikhe
-   - rooms/stats jaisa dusra public data bhi load ho
-   - mobile viewport par bhi banner visible ho
+**Seed data**: Main Gate, Parking, Library, Canteen + Academic Block / Technology Block / Administrative Block with their floors, stairs, and a handful of representative rooms (LT-204, HOD JMC Office, etc.). About 25–30 nodes, ~60 edges.
 
-Files likely involved:
-- `src/components/AnnouncementBanner.tsx`
-- `src/components/admin/AdminAnnouncements.tsx`
-- `src/hooks/useRooms.tsx`
-- `src/pages/Index.tsx`
-- possibly auth/query-related UI files if the loading issue traces there
+### 2. Navigation engine (`src/lib/navigation.ts`)
+- `buildGraph(locations, connections)` → adjacency map
+- `findShortestPath(graph, fromId, toId)` → BFS returning ordered list of `{ location, edge }` steps
+- `summarizeRoute(steps)` → total distance + estimated time + step instructions
 
-Technical notes:
-- Current backend rules allow public read for active announcements, so students ko banner dekhne ke liye login ki zaroorat nahi honi chahiye.
-- Current backend rules do not allow public writes, so direct-open admin UI ke bawajood create/delete tab tak fail honge jab tak real admin auth na ho.
-- Main fix ka focus hoga:
-  1) public read path ko reliable banana
-  2) admin write flow ko backend permissions ke saath consistent banana
-  3) blank UI ki jagah clear loading/error feedback dena
+### 3. Hooks (`src/hooks/useLocations.tsx`)
+- `useLocations()` — list all
+- `useConnections()` — list all
+- `useRoute(fromId, toId)` — memoized BFS result
+- Admin CRUD for locations + connections
+
+### 4. UI
+
+**`src/pages/Navigate.tsx`** (route `/navigate`)
+- Step 1: From dropdown (Combobox, searchable, defaults to "Main Gate")
+- Step 2: To searchable combobox (rooms + offices + landmarks)
+- Result card: destination header, ordered route timeline (reuses NavigationSteps visual style), total time + distance, verified badge, photo button
+
+**`src/components/RouteCard.tsx`** — modern minimal route card
+
+**Admin** (`/admin/locations`) — manage nodes & edges in two tabs.
+
+### 5. Wiring
+- Add `/navigate` route in `App.tsx` and a CTA button on `Index.tsx` and `Header.tsx`
+- Add `locations` admin section in `AdminSidebar` + `Admin.tsx`
+- Keep existing rooms/departments untouched (no breaking changes)
+
+### Technical notes
+- BFS is sufficient (graph is small, edge weights similar). If weights diverge later, swap to Dijkstra — same interface.
+- Each room can optionally link to a `locations` row via `room_id` so existing room search can deep-link into `/navigate?to=<locationId>`.
+- All colors via existing semantic tokens.
+
+### Out of scope
+- Map rendering / floor plans
+- Realtime crowd-sourced edges
+- Multi-floor lift logic beyond a single edge per stop

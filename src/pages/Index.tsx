@@ -90,6 +90,14 @@ export default function Index() {
               Search by room code, lab name, or facility and get
               <span className="text-foreground font-medium"> step-by-step directions</span> instantly.
             </p>
+            <div className="mt-5 flex items-center justify-center gap-3">
+              <a href="/navigate" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition">
+                <Navigation className="h-4 w-4" /> Smart Navigate
+              </a>
+              <a href="/departments" className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium hover:bg-muted/50 transition">
+                Browse Departments
+              </a>
+            </div>
           </div>
         </div>
 
