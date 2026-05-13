@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Admin from "./pages/Admin";
 import Departments from "./pages/Departments";
+import Navigate from "./pages/Navigate";
 import NotFound from "./pages/NotFound";
 import InstallPrompt from "./components/InstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -36,7 +37,9 @@ const App = () => (
             <Route path="/admin/announcements" element={<Admin section="announcements" />} />
             <Route path="/admin/analytics" element={<Admin section="analytics" />} />
             <Route path="/admin/departments" element={<Admin section="departments" />} />
+            <Route path="/admin/locations" element={<Admin section="locations" />} />
             <Route path="/departments" element={<Departments />} />
+            <Route path="/navigate" element={<Navigate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

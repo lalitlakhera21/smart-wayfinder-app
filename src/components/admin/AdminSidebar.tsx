@@ -1,4 +1,4 @@
-import { LayoutDashboard, DoorOpen, Users, BarChart3, Megaphone, LogOut, MapPin, Inbox, Flag, FolderTree } from "lucide-react";
+import { LayoutDashboard, DoorOpen, Users, BarChart3, Megaphone, LogOut, MapPin, Inbox, Flag, FolderTree, Route as RouteIcon } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,6 +19,7 @@ const items = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Rooms", url: "/admin/rooms", icon: DoorOpen },
   { title: "Departments", url: "/admin/departments", icon: FolderTree },
+  { title: "Locations", url: "/admin/locations", icon: RouteIcon },
   { title: "Submissions", url: "/admin/submissions", icon: Inbox },
   { title: "Reports", url: "/admin/reports", icon: Flag },
   { title: "Users", url: "/admin/users", icon: Users },
