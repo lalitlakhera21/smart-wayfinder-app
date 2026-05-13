@@ -26,9 +26,10 @@ export default function Navigate() {
 
   const defaultFromName = "Main Gate";
   const defaultFrom = locations.find((l) => l.name === defaultFromName)?.id ?? "";
+  const queryFromId = params.get("from") ?? "";
   const queryToId = params.get("to") ?? "";
 
-  const [fromId, setFromId] = useState<string>(defaultFrom);
+  const [fromId, setFromId] = useState<string>(queryFromId || defaultFrom);
   const [toId, setToId] = useState<string>(queryToId);
   const [search, setSearch] = useState("");
   const { dark, toggle } = useTheme();
