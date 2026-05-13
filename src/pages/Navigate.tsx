@@ -142,7 +142,12 @@ export default function Navigate() {
           </Card>
         )}
 
-        {route && <RouteCard route={route} />}
+        {route && (
+          <>
+            <RouteCard route={route} />
+            <RouteMiniMap route={route} />
+          </>
+        )}
       </main>
     </div>
   );
