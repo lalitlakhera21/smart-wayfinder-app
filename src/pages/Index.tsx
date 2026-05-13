@@ -102,6 +102,16 @@ export default function Index() {
           </div>
         </div>
 
+        {/* Smart Navigate widget (Google Maps style: From → To) */}
+        <div className="w-full mb-4">
+          <NavigateWidget />
+        </div>
+
+        {/* Or search by room code */}
+        <div className="w-full max-w-2xl mx-auto text-center text-[11px] uppercase tracking-wider text-muted-foreground my-2">
+          or search by room
+        </div>
+
         {/* Search */}
         <SearchBar
           value={query}
