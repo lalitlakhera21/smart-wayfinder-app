@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import RouteCard from "@/components/RouteCard";
+import RouteMiniMap from "@/components/RouteMiniMap";
 import { useLocations, useConnections } from "@/hooks/useLocations";
 import { buildGraph, findShortestPath } from "@/lib/navigation";
 
