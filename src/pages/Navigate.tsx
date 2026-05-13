@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
 import Header from "@/components/Header";
+import { useTheme } from "@/hooks/useTheme";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ export default function Navigate() {
   const [fromId, setFromId] = useState<string>(defaultFrom);
   const [toId, setToId] = useState<string>(queryToId);
   const [search, setSearch] = useState("");
+  const { dark, toggle } = useTheme();
 
   // Refresh defaults once data loads
   if (!fromId && defaultFrom) setFromId(defaultFrom);
@@ -61,7 +63,7 @@ export default function Navigate() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header dark={dark} toggleTheme={toggle} />
       <main className="container max-w-2xl px-4 py-6 space-y-6">
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
